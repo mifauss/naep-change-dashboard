@@ -45,15 +45,15 @@ hovertemplate = (
 )
 
 # About this dashboard text
-with open("about.txt", "r") as file:
+with open("data/about.txt", "r") as file:
     about_text = file.read()
 
 # How-to text
-with open("howto.txt", "r") as file:
+with open("data/howto.txt", "r") as file:
     howto_text = file.read()
 
 # Title
-with open("title.txt", "r") as file:
+with open("data/title.txt", "r") as file:
     title = file.read()
 
 st.set_page_config(layout="wide")
@@ -66,7 +66,7 @@ st.expander("How to Use the Dashboard", expanded=True).markdown(howto_text)
 st.title(title)
 
 # Sidebar inputs
-st.sidebar.image("logo.png", width=200)
+st.sidebar.image("data/logo.png", width=200)
 st.sidebar.markdown("---")
 subject = st.sidebar.radio("Subject", subjects, index=subjects.index("Mathematics"))
 grade = st.sidebar.radio("Grade", grades, index=grades.index(8))
@@ -157,4 +157,4 @@ else:
     # Add legend (Legend entries are just images. This is not great, but it works for now.)
     cols = st.columns(6, gap="small")
     for col, percentile in zip(cols[:-1], [10, 25, 50, 75, 90]):
-        col.image(f"P{percentile}.png", width=178)
+        col.image(f"data/P{percentile}.png", width=178)
