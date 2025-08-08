@@ -1,0 +1,5 @@
+This dashboard visualizes the relationship between pre-COVID scores (2019) and score changes since the pandemic (2024–2019) across different percentiles for states and jurisdictions in NAEP assessments.
+ 
+Each line represents a state, connecting the score change at several percentile points (10th, 25th, 50th, 75th, and 90th). These lines illustrate how changes varied across the achievement distribution within each state. A horizontal line at zero helps distinguish states or percentile points within states with positive changes (above) from those with negative changes (below).
+ 
+If the difference between a state’s 10th and 90th percentile points is statistically significant (p < 0.05), this is indicated with an asterisk next to the state’s name in the legend.
