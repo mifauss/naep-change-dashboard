@@ -1,12 +1,5 @@
-Use the menu on the left to choose the subject, grade, and whether you'd like to compare all states or only selected ones.
- 
-You can interact with the plot one of two ways:
- 
-Using the **legend**: 
-* **Single-click** a state in the legend to toggle its line on or off. 
-* **Double-click** a legend entry to isolate that state’s line; double-click again to restore all the lines.
- 
-Using the **selection menu**:
-* Select states from the drop-down menu to view their lines only. Click the “x” next to a state name to de-select it.
- 
-Note that selecting states in the menu on the left is different from clicking their entries in the legend. Think of the selection menu as defining the *data*, and the legend clicks as toggling *visibility*.
+Using the legend
+
+**Single-click** a state to toggle its line on or off.
+
+**Double-click** a state to isolate it’s line; double-click again to restore all lines.

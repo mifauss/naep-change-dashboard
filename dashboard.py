@@ -60,10 +60,7 @@ st.set_page_config(layout="wide")
 
 # About and How-to
 st.expander("What This Dashboard Shows", expanded=True).markdown(about_text)
-st.expander("How to Use the Dashboard", expanded=True).markdown(howto_text)
-
-# Title
-st.title(title)
+st.text("")
 
 # Sidebar inputs
 st.sidebar.image("data/logo.png", width=200)
@@ -72,6 +69,14 @@ subject = st.sidebar.radio("Subject", subjects, index=subjects.index("Mathematic
 grade = st.sidebar.radio("Grade", grades, index=grades.index(8))
 display_mode = st.sidebar.radio("Display Mode", ["All States", "Selected States"], index=0)
 selected_states = st.sidebar.multiselect("Selected States", states, default=[], disabled=(display_mode == "All States"))
+
+# Title, subtitle and legend help
+col0, col1 = st.columns([0.85, 0.15], gap="small", vertical_alignment="top")
+col0.title("State Change by Baseline Scores Dashboard: Using NAEP Data")
+col0.header(f"{subject} Scores for Grade {grade}")
+col1.text("")
+col1.text("")
+col1.info(howto_text, icon=":material/help:", width="stretch")
 
 # Filter data by subject and grade
 dff = df[(df.Subject == subject) & (df.Grade == grade)]
@@ -141,7 +146,8 @@ else:
         ),
         xaxis_title=dict(text="2019 Score", font=dict(size=18)),
         yaxis_title=dict(text="Change (2024 - 2019)", font=dict(size=18)),
-        title=dict(text=f"{subject} Scores for Grade {grade}", font=dict(size=24)),
+        # title=dict(text=f"{subject} Scores for Grade {grade}", font=dict(size=24)),
+        margin=dict(t=30),
         legend=dict(font=dict(size=16)),
         template="plotly_white",
         height=750,
