@@ -68,7 +68,14 @@ st.sidebar.markdown("---")
 subject = st.sidebar.radio("Subject", subjects, index=subjects.index("Mathematics"))
 grade = st.sidebar.radio("Grade", grades, index=grades.index(8))
 display_mode = st.sidebar.radio("Display Mode", ["All States", "Selected States"], index=0)
-selected_states = st.sidebar.multiselect("Selected States", states, default=[], disabled=(display_mode == "All States"))
+selected_states = st.sidebar.multiselect(
+    "Selected States",
+    states,
+    default=[],
+    disabled=(display_mode == "All States"),
+    placeholder="Select from Drop-Down",
+    label_visibility="collapsed",
+)
 
 # Title, subtitle and legend help
 col0, col1 = st.columns([0.85, 0.15], gap="small", vertical_alignment="top")
@@ -111,7 +118,7 @@ else:
                         symbol=percentile_markers.get(row["Percentile"], "circle"),
                         color=state_colors[state],
                         size=14,
-                    )
+                    ),
                 )
             )
 
@@ -128,7 +135,7 @@ else:
                 line=dict(
                     color=state_colors[state],
                     width=3,
-                )
+                ),
             )
         )
 
