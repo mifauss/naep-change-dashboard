@@ -83,12 +83,11 @@ st.title("State Change by Baseline Scores Dashboard: Using NAEP Data")
 st.text("")
 
 # Flex-container for about and text
-outer_container = st.container(horizontal=True, gap="large", vertical_alignment="bottom")
+outer_container = st.container(horizontal=True, gap="large", vertical_alignment="top")
 about_container = outer_container.container(border=False)
-about_container.markdown("#### What this dashboard shows")
+about_container.markdown("#### What This Dashboard Shows")
 about_container.markdown(about_text)
 help_container = outer_container.container(border=False, width=240, height=250)
-help_container.text("")
 help_container.info(howto_text, icon=":material/help:", width="stretch")
 
 # Spacer
