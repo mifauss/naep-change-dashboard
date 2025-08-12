@@ -52,10 +52,15 @@ with open("data/about.txt", "r") as file:
 with open("data/howto.txt", "r") as file:
     howto_text = file.read()
 
-# Title
+# Title text
 with open("data/title.txt", "r") as file:
     title = file.read()
 
+# Show all/selected labels
+all_label = "Show All States"
+selected_label = "Select States of Interest from Drop-Down Menu"
+
+# Use whole page width
 st.set_page_config(layout="wide")
 
 # About and How-to
@@ -67,18 +72,18 @@ st.sidebar.image("data/logo.png", width=200)
 st.sidebar.markdown("---")
 subject = st.sidebar.radio("Subject", subjects, index=subjects.index("Mathematics"))
 grade = st.sidebar.radio("Grade", grades, index=grades.index(8))
-display_mode = st.sidebar.radio("Display Mode", ["All States", "Selected States"], index=0)
+display_mode = st.sidebar.radio("Display Mode", [all_label, selected_label], index=0)
 selected_states = st.sidebar.multiselect(
     "Selected States",
     states,
     default=[],
-    disabled=(display_mode == "All States"),
-    placeholder="Select from Drop-Down",
+    disabled=(display_mode == all_label),
+    placeholder="Select States",
     label_visibility="collapsed",
 )
 
 # Title, subtitle and legend help
-col0, col1 = st.columns([0.85, 0.15], gap="small", vertical_alignment="top")
+col0, col1 = st.columns([0.85, 0.155], gap="small", vertical_alignment="top")
 col0.title("State Change by Baseline Scores Dashboard: Using NAEP Data")
 col0.header(f"{subject} Scores for Grade {grade}")
 col1.text("")
@@ -91,11 +96,11 @@ dff = df[(df.Subject == subject) & (df.Grade == grade)]
 # Initialize figure
 fig = go.Figure()
 
-if display_mode == "Selected States" and not selected_states:
+if display_mode == selected_label and not selected_states:
     st.warning("Select one or more states to view data.")
 else:
     # States to show
-    states_to_show = selected_states if display_mode == "Selected States" else states
+    states_to_show = selected_states if display_mode == selected_label else states
 
     # Iterate over states to show
     for n, state in enumerate(states_to_show):
