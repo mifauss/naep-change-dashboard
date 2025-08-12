@@ -63,10 +63,6 @@ selected_label = "Select States of Interest from Drop-Down Menu"
 # Use whole page width
 st.set_page_config(layout="wide")
 
-# About and How-to
-st.expander("What This Dashboard Shows", expanded=True).markdown(about_text)
-st.text("")
-
 # Sidebar inputs
 st.sidebar.image("data/logo.png", width=200)
 st.sidebar.markdown("---")
@@ -83,12 +79,20 @@ selected_states = st.sidebar.multiselect(
 )
 
 # Title, subtitle and legend help
-col0, col1 = st.columns([0.85, 0.155], gap="small", vertical_alignment="top")
-col0.title("State Change by Baseline Scores Dashboard: Using NAEP Data")
-col0.header(f"{subject} Scores for Grade {grade}")
-col1.text("")
-col1.text("")
-col1.info(howto_text, icon=":material/help:", width="stretch")
+st.title("State Change by Baseline Scores Dashboard: Using NAEP Data")
+st.text("")
+
+# Flex-container for about and text
+outer_container = st.container(horizontal=True, gap="large", vertical_alignment="bottom")
+about_container = outer_container.container(border=False)
+about_container.markdown("#### What this dashboard shows")
+about_container.markdown(about_text)
+help_container = outer_container.container(border=False, width=240, height=250)
+help_container.text("")
+help_container.info(howto_text, icon=":material/help:", width="stretch")
+
+# Spacer
+st.text("")
 
 # Filter data by subject and grade
 dff = df[(df.Subject == subject) & (df.Grade == grade)]
@@ -158,8 +162,8 @@ else:
         ),
         xaxis_title=dict(text="2019 Score", font=dict(size=18)),
         yaxis_title=dict(text="Change (2024 - 2019)", font=dict(size=18)),
-        # title=dict(text=f"{subject} Scores for Grade {grade}", font=dict(size=24)),
-        margin=dict(t=30),
+        margin=dict(t=60),
+        title=dict(text=f"{subject} Scores for Grade {grade}", font=dict(size=28)),
         legend=dict(font=dict(size=16)),
         template="plotly_white",
         height=750,
