@@ -83,7 +83,7 @@ st.title("State Change by Baseline Scores Dashboard: Using NAEP Data")
 st.text("")
 
 # Flex-container for about and text
-outer_container = st.container(horizontal=True, gap="large", vertical_alignment="top")
+outer_container = st.container(horizontal=True, gap="large", vertical_alignment="bottom")
 about_container = outer_container.container(border=False)
 about_container.markdown("#### What This Dashboard Shows")
 about_container.markdown(about_text)
@@ -159,8 +159,8 @@ else:
             tickfont=dict(size=16),
             showgrid=True,
         ),
-        xaxis_title=dict(text="2019 Score", font=dict(size=18)),
-        yaxis_title=dict(text="Change (2024 - 2019)", font=dict(size=18)),
+        xaxis_title=dict(text="2019 Score (Baseline)", font=dict(size=18)),
+        yaxis_title=dict(text="Change (2024 Score Minus 2019 Score)", font=dict(size=18)),
         margin=dict(t=60),
         title=dict(text=f"{subject} Scores for Grade {grade}", font=dict(size=28)),
         legend=dict(font=dict(size=16)),
