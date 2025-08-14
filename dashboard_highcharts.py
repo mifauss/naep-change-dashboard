@@ -175,6 +175,17 @@ else:
                 "states": {"inactive": {"opacity": 0.3}},
             }
         },
+        "accessibility": {
+            "enabled": True,
+            "keyboardNavigation": {"enabled": True},
+            "screenReaderSection": {
+                "beforeChartFormat": (
+                    "<h1>{chartTitle}</h1>"
+                    "<p>This chart shows NAEP 2019 baseline scores on the x-axis and 2024 minus 2019 change on the y-axis. "
+                    "Each series represents a state across five percentiles.</p>"
+                )
+            }
+        },
         "series": series,
         "credits": {"enabled": False},
         "exporting": {"enabled": True},
@@ -182,7 +193,11 @@ else:
 
     col1, col2, col3 = st.columns([1, 15, 1])
     with col2:
-        hct.streamlit_highcharts(options, height="850px", key=f"hc-{subject}-{grade}-{len(states_to_show)}")
+        hct.streamlit_highcharts(
+            options, 
+            height="850px", 
+            key=f"hc-{subject}-{grade}-{len(states_to_show)}",
+        )
 
     # Optional: small legend for percentile marker shapes
     # (Highcharts doesn't have a built-in multi-shape legend, but you can add a help box or small markdown)
