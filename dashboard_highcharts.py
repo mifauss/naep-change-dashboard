@@ -133,7 +133,7 @@ else:
 
     # Highcharts config
     options = {
-        "chart": {"type": "line", "height": 850, "width": 1200},
+        "chart": {"type": "line", "height": 850},
         "title": {"text": f"{subject} Scores for Grade {grade}"},
         "legend": {
             "enabled": True,
@@ -180,7 +180,7 @@ else:
         "exporting": {"enabled": True},
     }
 
-    col1, col2, col3 = st.columns([1, 10, 1])
+    col1, col2, col3 = st.columns([1, 15, 1])
     with col2:
         hct.streamlit_highcharts(options, height="850px", key=f"hc-{subject}-{grade}-{len(states_to_show)}")
 
