@@ -81,6 +81,7 @@ selected_states = st.sidebar.multiselect(
     default=[],
     disabled=(display_mode == ALL_LABEL),
     placeholder="Select States",
+    label_visibility="collapsed",
 )
 
 st.title(title_text)
