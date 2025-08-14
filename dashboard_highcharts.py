@@ -35,8 +35,6 @@ def make_point(row, color, is_selected):
             "score2024": int(np.rint(row["Score.2024"])),
             "change": int(np.rint(row["Score.Change"])),
         },
-        # Show a cleaner hover label name (not critical; tooltip uses custom)
-        "name": f"{row['State']} • P{p}",
     }
 
 # -------------------------
@@ -168,6 +166,7 @@ else:
                 "Change: {point.custom.change} points"
             ),
             "shared": False,
+            'headerFormat': '',
         },
         "plotOptions": {
             "series": {
