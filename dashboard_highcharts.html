@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NAEP State Change by Baseline Scores (Highcharts)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Highcharts + Accessibility -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/series-label.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root { --page-max: 1400px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; color: #222; background:#fafafa;}
+    header { padding: 24px 16px 8px; border-bottom: 1px solid #eee; background:#fff; }
+    header .wrap { max-width: var(--page-max); margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    .sub { color: #555; margin: 0 0 12px; }
+    .wrap { max-width: var(--page-max); margin: 16px auto; padding: 0 16px; }
+    .layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; }
+    @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
+    .panel { border: 1px solid #eee; border-radius: 12px; padding: 14px 16px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .panel h3 { margin: 0 0 10px; font-size: 16px; }
+    .panel label { display: block; margin: 8px 0 6px; font-weight: 600; font-size: 13px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .help { background: #f6fbff; border: 1px solid #e8f3ff; color: #0b5cab; }
+    .small { font-size: 13px; color: #555; }
+    select[multiple] { width: 100%; min-height: 200px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; background: #fff; font-size: 14px; }
+    .radio-group { display: grid; gap: 6px; }
+    .radio-group label { font-weight: 400; }
+    .warn { padding: 10px; border-radius: 10px; background: #fff8e1; border: 1px solid #ffe199; color: #8a6d1d; margin-bottom: 12px; }
+    .legend-hint { margin-top: 6px; color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>State Change by Baseline Scores Dashboard: Using NAEP Data</h1>
+      <p class="sub">NAEP 2019 baseline score (x-axis) vs. 2024−2019 change (y-axis), across percentiles (10/25/50/75/90) by state.</p>
+    </div>
+  </header>
+
+  <!-- What this dashboard shows (top) -->
+  <section class="wrap">
+    <div class="panel">
+      <h3>What This Dashboard Shows</h3>
+      <div class="small">
+        This dashboard visualizes the relationship between pre-COVID scores (2019) and score changes since the pandemic (2024−2019) across percentiles
+        (10th, 25th, 50th, 75th, and 90th) for states/jurisdictions in NAEP. A horizontal line at zero separates states with overall positive
+        changes (above) from those with negative changes (below). If a state’s 10th–90th percentile difference is statistically significant (p &lt; 0.05),
+        an asterisk (*) is shown next to the state name in the legend.
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div id="warn" class="warn" style="display:none;"></div>
+
+    <div class="layout">
+      <!-- Controls -->
+      <aside class="panel">
+        <h3>Controls</h3>
+
+        <label>Subject</label>
+        <div id="subject-group" class="radio-group"></div>
+
+        <label>Grade</label>
+        <div id="grade-group" class="radio-group"></div>
+
+        <label>Display Mode</label>
+        <div id="mode-group" class="radio-group"></div>
+
+        <label for="state-select">Selected States</label>
+        <select id="state-select" multiple></select>
+        <div class="small" style="margin-top:6px;">Tip: Hold <b>Ctrl</b>/<b>Cmd</b> (or Shift) to select multiple.</div>
+
+        <div class="panel help" style="margin-top:12px;">
+          <strong>How to use</strong>
+          <div class="small">
+            Use the controls above to choose subject and grade. In “Selected States” mode, pick specific states.
+            In the chart, click legend entries to show/hide a state.
+          </div>
+        </div>
+      </aside>
+
+      <!-- Chart -->
+      <section>
+        <div id="container" class="panel" style="overflow:hidden;">
+          <div id="chart" style="min-height: 800px;"></div>
+          <div class="legend-hint">Percentile markers: 10 = ●, 25 = ■, 50 = ◆, 75 = ▲, 90 = ▼</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ---------------------------
+    // Config
+    // ---------------------------
+    const CSV_URL = "https://raw.githubusercontent.com/katcast/DataProject/main/Data_for_App_v2.csv";
+    const ALL_LABEL = "Show All States";
+    const SEL_LABEL = "Select States from Drop-Down Menu";
+    const PERCENTILE_MARKERS = {10: "circle", 25: "square", 50: "diamond", 75: "triangle", 90: "triangle-down"};
+
+    // Colors
+    function buildColorMap(states) {
+      const base = Highcharts.getOptions().colors;
+      const colors = [];
+      while (colors.length < states.length) colors.push(...base);
+      const map = {};
+      states.forEach((s, i) => map[s] = colors[i]);
+      return map;
+    }
+
+    // UI elements
+    const subjectGroup = document.getElementById("subject-group");
+    const gradeGroup = document.getElementById("grade-group");
+    const modeGroup = document.getElementById("mode-group");
+    const stateSelect = document.getElementById("state-select");
+    const warnBox = document.getElementById("warn");
+
+    // State
+    let DATA = [];
+    let subjects = [];
+    let grades = [];
+    let states = [];
+    let colorMap = {};
+
+    let current = {
+      subject: "Mathematics",
+      grade: 8,
+      mode: ALL_LABEL,
+      selectedStates: []
+    };
+
+    // ---------------------------
+    // Setup UI
+    // ---------------------------
+    function radio(name, value, checked=false) {
+      const id = name + "-" + String(value).replace(/\s+/g, "-");
+      const label = document.createElement("label");
+      label.setAttribute("for", id);
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = name;
+      input.id = id;
+      input.value = value;
+      input.checked = checked;
+      label.prepend(input);
+      label.append(" " + value);
+      return label;
+    }
+
+    function buildRadios(container, name, values, selectedValue) {
+      container.innerHTML = "";
+      values.forEach(v => container.appendChild(radio(name, v, v === selectedValue)));
+      container.onchange = (e) => {
+        if (e.target && e.target.name === name) {
+          const val = (name === "grade") ? Number(e.target.value) : e.target.value;
+          current[name] = val;
+          updateStateSelectDisabled();
+          render();
+        }
+      };
+    }
+
+    function buildStateSelect(options, selected=[]) {
+      stateSelect.innerHTML = "";
+      options.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s;
+        if (selected.includes(s)) opt.selected = true;
+        stateSelect.appendChild(opt);
+      });
+      stateSelect.onchange = () => {
+        const chosen = Array.from(stateSelect.selectedOptions).map(o => o.value);
+        current.selectedStates = chosen;
+        render();
+      };
+    }
+
+    function updateStateSelectDisabled() {
+      const disabled = current.mode === ALL_LABEL;
+      stateSelect.disabled = disabled;
+      stateSelect.title = disabled ? "Enabled only in 'Selected States' mode" : "";
+    }
+
+    // ---------------------------
+    // Chart building
+    // ---------------------------
+    function makePoint(row, color, isSelected) {
+      const p = Number(row["Percentile"]);
+      const score2019 = Math.round(Number(row["Score.2019"]));
+      const score2024 = Math.round(Number(row["Score.2024"]));
+      const change = Math.round(Number(row["Score.Change"]));
+      const sigStr = String(row["significant"]).toLowerCase();
+      const significant = (sigStr === "true" || sigStr === "1");
+
+      return {
+        x: score2019,
+        y: change,
+        marker: { symbol: PERCENTILE_MARKERS[p] || "circle", radius: isSelected ? 7 : 5, lineColor: "black", lineWidth: 1, fillColor: color },
+        color,
+        custom: { state: `${row["State"]}${significant ? "*" : ""}`, percentile: p, score2019, score2024, change },
+        name: `${row["State"]} • P${p}`,
+        accessibility: { description: `${row["State"]} percentile ${p}, baseline ${score2019}, 2024 score ${score2024}, change ${change}.` }
+      };
+    }
+
+    function buildSeries(filtered, selectedList) {
+      const series = [];
+      const statesToInclude = (current.mode === SEL_LABEL && selectedList.length)
+        ? selectedList
+        : Array.from(new Set(filtered.map(r => r.State)));
+
+      statesToInclude.forEach(state => {
+        const rows = filtered.filter(r => r.State === state).sort((a,b) => a.Percentile - b.Percentile);
+        const significantAny = rows.some(r => {
+          const s = String(r.significant).toLowerCase();
+          return (s === "true" || s === "1");
+        });
+        const color = colorMap[state];
+        const isSel = selectedList.includes(state);
+        const data = rows.map(r => makePoint(r, color, isSel));
+
+        series.push({
+          type: "line",
+          name: state + (significantAny ? "*" : ""),
+          data,
+          color,
+          lineWidth: isSel ? 3 : 1,
+          marker: { enabled: true },
+          showInLegend: true,
+          states: { hover: { enabled: true } },
+          accessibility: { description: `Trend for ${state} across five percentiles.` }
+        });
+      });
+
+      return series;
+    }
+
+    function computeAxisRanges(filtered) {
+      const xs = filtered.map(r => Number(r["Score.2019"])).filter(v => Number.isFinite(v));
+      const ys = filtered.map(r => Number(r["Score.Change"])).filter(v => Number.isFinite(v));
+      if (!xs.length || !ys.length) return { xMin: 0, xMax: 1, yMin: -1, yMax: 1 };
+      const xMin = Math.floor(Math.min(...xs) - 2);
+      const xMax = Math.ceil(Math.max(...xs) + 2);
+      const yMin = Math.floor(Math.min(...ys) - 1);
+      const yMax = Math.ceil(Math.max(...ys) + 1);
+      return { xMin, xMax, yMin, yMax };
+    }
+
+    let chart = null;
+
+    function renderChart(series, ranges, subject, grade) {
+      if (chart) chart.destroy();
+
+      chart = Highcharts.chart('chart', {
+        chart: { type: 'line', height: 800, width: 1100 },
+        title: { text: `${subject} Scores for Grade ${grade}` },
+        legend: { enabled: true },
+        xAxis: {
+          title: { text: '2019 Score (Baseline)' },
+          min: ranges.xMin, max: ranges.xMax,
+          gridLineWidth: 1, tickLength: 0
+        },
+        yAxis: {
+          title: { text: 'Change (2024 Score Minus 2019 Score)' },
+          min: ranges.yMin, max: ranges.yMax,
+          gridLineWidth: 1,
+          plotLines: [{ value: 0, width: 2, color: 'black', zIndex: 5 }]
+        },
+        tooltip: {
+          useHTML: true,
+          pointFormat:
+            "<b>{point.custom.state}</b><br/>" +
+            "Percentile: {point.custom.percentile}th<br/>" +
+            "2019 Score: {point.custom.score2019}<br/>" +
+            "2024 Score: {point.custom.score2024}<br/>" +
+            "Change: {point.custom.change} points",
+          shared: false,
+          headerFormat: "",
+        },
+        plotOptions: {
+          series: {
+            animation: true,
+            stickyTracking: true,
+            states: { inactive: { opacity: 0.25 } },
+            label: {
+              connectorAllowed: false
+            }
+          },
+          seriesLabels: {
+            enabled: true,
+            allowOverlap: false,
+            style: {
+              fontSize: "12px",
+              fontWeight: "normal"
+            }
+          }
+        },
+        accessibility: {
+          enabled: true,
+          keyboardNavigation: { enabled: true },
+          screenReaderSection: {
+            beforeChartFormat:
+              "<h1>{chartTitle}</h1><p>This chart shows NAEP 2019 baseline scores on the x-axis and 2024 minus 2019 change on the y-axis. " +
+              "Each series represents a state across five percentiles.</p>"
+          }
+        },
+        credits: { enabled: false },
+        exporting: { enabled: true },
+        series
+      });
+    }
+
+    // ---------------------------
+    // Render main
+    // ---------------------------
+    function render() {
+      const filtered = DATA.filter(r => r.Subject === current.subject && Number(r.Grade) === Number(current.grade));
+      const warn = (current.mode === SEL_LABEL && current.selectedStates.length === 0);
+
+      // Show/hide the warning text
+      warnBox.style.display = warn ? "block" : "none";
+      warnBox.innerText = warn ? "Select one or more states to view data." : "";
+
+      // >>> CHANGE: when in Selected States mode with no selection, clear the chart and stop.
+      if (warn) {
+        if (chart) {
+          chart.update({ series: [] }, true, true);  // clear all series
+        }
+        return;
+      }
+      // <<< END CHANGE
+
+      const series = buildSeries(filtered, current.selectedStates);
+      const ranges = computeAxisRanges(filtered);
+      renderChart(series, ranges, current.subject, current.grade);
+    }
+
+    // ---------------------------
+    // Load data (robust)
+    // ---------------------------
+    async function loadCSV() {
+      const resp = await fetch(CSV_URL, { cache: "no-store" });
+      if (!resp.ok) throw new Error("Failed to load CSV: " + resp.statusText);
+      const text = await resp.text();
+
+      const parsed = Papa.parse(text, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: 'greedy'
+      });
+
+      const rows = (parsed.data || [])
+        .filter(r => r && typeof r === 'object')
+        .map(r => ({
+          Subject: r.Subject ?? r.subject ?? "",
+          Grade: Number(r.Grade ?? r.grade),
+          State: r.State ?? r.state ?? "",
+          Percentile: Number(r.Percentile ?? r.percentile),
+          "Score.2019": Number(r["Score.2019"] ?? r.Score2019 ?? r.score2019),
+          "Score.2024": Number(r["Score.2024"] ?? r.Score2024 ?? r.score2024),
+          "Score.Change": Number(r["Score.Change"] ?? r.ScoreChange ?? r.scoreChange),
+          significant: r.significant ?? r.Significant ?? r.SIGNIFICANT ?? false
+        }))
+        .filter(r =>
+          r.Subject &&
+          Number.isFinite(r.Grade) &&
+          r.State &&
+          Number.isFinite(r.Percentile) &&
+          Number.isFinite(r["Score.2019"]) &&
+          Number.isFinite(r["Score.2024"]) &&
+          Number.isFinite(r["Score.Change"])
+        );
+
+      if (!rows.length) throw new Error("No valid rows after parsing.");
+      return rows;
+    }
+
+    (async function init() {
+      try {
+        DATA = await loadCSV();
+
+        subjects = Array.from(new Set(DATA.map(r => r.Subject))).sort();
+        grades = Array.from(new Set(DATA.map(r => Number(r.Grade)))).sort((a,b) => a-b);
+        states = Array.from(new Set(DATA.map(r => r.State))).sort();
+        colorMap = buildColorMap(states);
+
+        // Build controls with persistent handlers
+        buildRadios(subjectGroup, "subject", subjects, current.subject);
+        buildRadios(gradeGroup, "grade", grades, current.grade);
+        buildRadios(modeGroup, "mode", [ALL_LABEL, SEL_LABEL], current.mode);
+        modeGroup.onchange = (e) => {
+          if (e.target && e.target.name === "mode") {
+            current.mode = e.target.value;
+            updateStateSelectDisabled();
+            render();
+          }
+        };
+
+        buildStateSelect(states, current.selectedStates);
+        updateStateSelectDisabled();
+
+        render();
+      } catch (err) {
+        warnBox.style.display = "block";
+        warnBox.innerText = "Error loading data: " + (err && err.message ? err.message : String(err));
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
