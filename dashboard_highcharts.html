@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>NAEP State Change by Baseline Scores (Highcharts)</title>
+  <title>Tracking Cohort Change in NAEP Scores across the Achievement Spectrum (Highcharts)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Highcharts + Accessibility -->
+  <!-- Highcharts + Series Labels + Accessibility -->
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/series-label.js"></script>
   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
@@ -21,38 +21,69 @@
     h1 { margin: 0 0 6px; font-size: 24px; }
     .sub { color: #555; margin: 0 0 12px; }
     .wrap { max-width: var(--page-max); margin: 16px auto; padding: 0 16px; }
+
     .layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; }
     @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
-    .panel { border: 1px solid #eee; border-radius: 12px; padding: 14px 16px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+
+    .panel { border: 1px solid #eee; border-radius: 12px; padding: 14px 16px; background: #fff;
+             box-shadow: 0 1px 2px rgba(0,0,0,0.03); box-sizing: border-box; min-width: 0; }
     .panel h3 { margin: 0 0 10px; font-size: 16px; }
     .panel label { display: block; margin: 8px 0 6px; font-weight: 600; font-size: 13px; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; }
     .help { background: #f6fbff; border: 1px solid #e8f3ff; color: #0b5cab; }
     .small { font-size: 13px; color: #555; }
     select[multiple] { width: 100%; min-height: 200px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; background: #fff; font-size: 14px; }
-    .radio-group { display: grid; gap: 6px; }
+    .radio-group { display: grid; gap: 0px; }
     .radio-group label { font-weight: 400; }
     .warn { padding: 10px; border-radius: 10px; background: #fff8e1; border: 1px solid #ffe199; color: #8a6d1d; margin-bottom: 12px; }
     .legend-hint { margin-top: 6px; color: #666; font-size: 12px; }
+
+    /* --- custom legend styles --- */
+    #custom-legend { margin-top: 10px; }
+    #custom-legend .legend-grid {
+      display: grid;
+      grid-auto-flow: column;
+      gap: 6px 16px;
+    }
+    #custom-legend .legend-item {
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 12px;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+    #custom-legend .swatch {
+      width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; border: 1px solid #00000022;
+      flex: 0 0 auto;
+    }
+    #custom-legend .hidden { opacity: 0.4; text-decoration: line-through; }
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
-      <h1>State Change by Baseline Scores Dashboard: Using NAEP Data</h1>
-      <p class="sub">NAEP 2019 baseline score (x-axis) vs. 2024−2019 change (y-axis), across percentiles (10/25/50/75/90) by state.</p>
+      <h1>Tracking Cohort Change in NAEP Scores across the Achievement Spectrum</h1>
+      <p class="sub">Change-by-Baseline Plot: 2019 NAEP baseline score (x-axis) vs. 2024 minus 2019 change (y-axis), across percentiles (10/25/50/75/90) by state.</p>
     </div>
   </header>
 
   <!-- What this dashboard shows (top) -->
   <section class="wrap">
-    <div class="panel">
-      <h3>What This Dashboard Shows</h3>
-      <div class="small">
-        This dashboard visualizes the relationship between pre-COVID scores (2019) and score changes since the pandemic (2024−2019) across percentiles
-        (10th, 25th, 50th, 75th, and 90th) for states/jurisdictions in NAEP. A horizontal line at zero separates states with overall positive
-        changes (above) from those with negative changes (below). If a state’s 10th–90th percentile difference is statistically significant (p &lt; 0.05),
-        an asterisk (*) is shown next to the state name in the legend.
+    <div class="layout">
+      <div class="panel" style="grid-column: 1 / -1;">
+        <h3>What This Dashboard Shows</h3>
+        <div class="medium">
+          As featured in the ETS Research Institute Blog [here], this dashboard helps visualize the relationship between pre-COVID NAEP scores (2019) and score changes since the pandemic (2024 scores minus 2019 scores) for states and jurisdictions (e.g., Puerto Rico). Check out the blog for more details. <br><br>
+          For a particular grade-subject combination, each state and jurisdiction has a line that connects the score changes for students at low (10<sup>th</sup> and 25<sup>th</sup> percentiles), moderate (50<sup>th</sup> percentile), and high (75<sup>th</sup> and 90<sup>th</sup> percentiles) points of the student achievement spectrum. These lines illustrate how changes from pre to post pandemic varied across the achievement distribution within each state:
+          <ul>
+            <li>Flatter lines indicate more comparable score changes along the distribution.</li>
+            <li>Upward sloping lines suggest larger drops at the low end of the spectrum or a widening of the achievement disparity between lower- and higher-scoring students from 2019 to 2024.</li>
+            <li>An asterisk (*) next to the state’s name in the legend indicates a significantly (p < 0.05) larger drop at the 10th percentile than the 90th percentile.</li>
+            <li>The horizontal line at zero helps distinguish cases with score increases (above the zero line) from those with score decreases (below the zero line).</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -85,13 +116,15 @@
             In the chart, click legend entries to show/hide a state.
           </div>
         </div>
+        <br>
+        <img src="data/logo.png" alt="ETS Research Institute logo" width="125" height="75" style="border:1px solid white; margin:2px">
       </aside>
 
       <!-- Chart -->
       <section>
         <div id="container" class="panel" style="overflow:hidden;">
-          <div id="chart" style="min-height: 800px;"></div>
-          <div class="legend-hint">Percentile markers: 10 = ●, 25 = ■, 50 = ◆, 75 = ▲, 90 = ▼</div>
+          <div id="chart" style="min-height: 650px; width: 100%;"></div>
+          <div id="custom-legend"></div>
         </div>
       </section>
     </div>
@@ -104,7 +137,7 @@
     const CSV_URL = "https://raw.githubusercontent.com/katcast/DataProject/main/Data_for_App_v2.csv";
     const ALL_LABEL = "Show All States";
     const SEL_LABEL = "Select States from Drop-Down Menu";
-    const PERCENTILE_MARKERS = {10: "circle", 25: "square", 50: "diamond", 75: "triangle", 90: "triangle-down"};
+    const PERCENTILE_MARKERS = {10: "triangle-down", 25: "square", 50: "diamond", 75: "circle", 90: "triangle"};
 
     // Colors
     function buildColorMap(states) {
@@ -122,6 +155,7 @@
     const modeGroup = document.getElementById("mode-group");
     const stateSelect = document.getElementById("state-select");
     const warnBox = document.getElementById("warn");
+    const customLegendEl = document.getElementById("custom-legend");
 
     // State
     let DATA = [];
@@ -129,10 +163,11 @@
     let grades = [];
     let states = [];
     let colorMap = {};
+    let chart = null;
 
     let current = {
-      subject: "Mathematics",
-      grade: 8,
+      subject: "Reading",
+      grade: 4,
       mode: ALL_LABEL,
       selectedStates: []
     };
@@ -233,10 +268,11 @@
           name: state + (significantAny ? "*" : ""),
           data,
           color,
-          lineWidth: isSel ? 3 : 1,
+          lineWidth: 2,
           marker: { enabled: true },
-          showInLegend: true,
+          showInLegend: false,                 // using custom legend
           states: { hover: { enabled: true } },
+          label: { enabled: true },            // on-chart labels (series-label module)
           accessibility: { description: `Trend for ${state} across five percentiles.` }
         });
       });
@@ -250,20 +286,22 @@
       if (!xs.length || !ys.length) return { xMin: 0, xMax: 1, yMin: -1, yMax: 1 };
       const xMin = Math.floor(Math.min(...xs) - 2);
       const xMax = Math.ceil(Math.max(...xs) + 2);
-      const yMin = Math.floor(Math.min(...ys) - 1);
-      const yMax = Math.ceil(Math.max(...ys) + 1);
+      const yMin = -20;
+      const yMax = 10;
       return { xMin, xMax, yMin, yMax };
     }
-
-    let chart = null;
 
     function renderChart(series, ranges, subject, grade) {
       if (chart) chart.destroy();
 
       chart = Highcharts.chart('chart', {
-        chart: { type: 'line', height: 800, width: 1100 },
+        chart: { type: 'line', height: 650, spacingRight: 80 }, // responsive: no fixed width
         title: { text: `${subject} Scores for Grade ${grade}` },
-        legend: { enabled: true },
+        subtitle: {
+          text: `Percentile Symbols:  ▼ 10th   ■ 25th   ◆ 50th   ● 75th    ▲ 90th`,
+          style: {fontSize: '14px', letterSpacing: '0.2em'}
+        },
+        legend: { enabled: false }, // using custom legend
         xAxis: {
           title: { text: '2019 Score (Baseline)' },
           min: ranges.xMin, max: ranges.xMax,
@@ -292,15 +330,9 @@
             stickyTracking: true,
             states: { inactive: { opacity: 0.25 } },
             label: {
-              connectorAllowed: false
-            }
-          },
-          seriesLabels: {
-            enabled: true,
-            allowOverlap: false,
-            style: {
-              fontSize: "12px",
-              fontWeight: "normal"
+              enabled: true,
+              connectorAllowed: false,
+              style: { fontSize: '12px', fontWeight: 'normal' }
             }
           }
         },
@@ -317,6 +349,78 @@
         exporting: { enabled: true },
         series
       });
+
+      // Ensure Highcharts knows its size inside CSS grid
+      chart.reflow();
+      window.addEventListener('resize', () => chart && chart.reflow());
+
+      // (Re)build custom legend after chart renders
+      renderCustomLegend(chart, 6); // desired number of columns
+    }
+
+    // ---------------------------
+    // Custom legend (column-first)
+    // ---------------------------
+    function renderCustomLegend(chart, columns = 4) {
+      const items = chart.series.map((s, idx) => ({
+        index: idx,
+        name: s.name,
+        color: s.color,
+        visible: s.visible
+      }));
+
+      const n = items.length;
+      const rows = Math.ceil(n / columns);
+
+      // Build a column-first matrix
+      const grid = [];
+      for (let c = 0; c < columns; c++) {
+        grid[c] = [];
+        for (let r = 0; r < rows; r++) {
+          const i = c * rows + r;
+          if (i < n) grid[c].push(items[i]);
+        }
+      }
+
+      // Render as a grid (columns x rows)
+      const gridEl = document.createElement('div');
+      gridEl.className = 'legend-grid';
+      gridEl.style.gridTemplateColumns = `repeat(${columns}, auto)`;
+
+      for (let c = 0; c < columns; c++) {
+        const colFrag = document.createDocumentFragment();
+        grid[c].forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'legend-item' + (item.visible ? '' : ' hidden');
+          div.dataset.seriesIndex = String(item.index);
+
+          const sw = document.createElement('span');
+          sw.className = 'swatch';
+          sw.style.background = item.color;
+
+          const label = document.createElement('span');
+          label.textContent = item.name;
+
+          div.appendChild(sw);
+          div.appendChild(label);
+
+          div.onclick = () => {
+            const s = chart.series[item.index];
+            s.setVisible(!s.visible, true);
+            if (s.visible) div.classList.remove('hidden');
+            else div.classList.add('hidden');
+          };
+
+          colFrag.appendChild(div);
+        });
+
+        const colContainer = document.createElement('div');
+        colContainer.appendChild(colFrag);
+        gridEl.appendChild(colContainer);
+      }
+
+      customLegendEl.innerHTML = '';
+      customLegendEl.appendChild(gridEl);
     }
 
     // ---------------------------
@@ -324,20 +428,17 @@
     // ---------------------------
     function render() {
       const filtered = DATA.filter(r => r.Subject === current.subject && Number(r.Grade) === Number(current.grade));
-      const warn = (current.mode === SEL_LABEL && current.selectedStates.length === 0);
+      const empty = (current.mode === SEL_LABEL && current.selectedStates.length === 0);
 
       // Show/hide the warning text
-      warnBox.style.display = warn ? "block" : "none";
-      warnBox.innerText = warn ? "Select one or more states to view data." : "";
+      // warnBox.style.display = warn ? "block" : "none";
+      // warnBox.innerText = warn ? "Select one or more states to view data." : "";
 
-      // >>> CHANGE: when in Selected States mode with no selection, clear the chart and stop.
-      if (warn) {
-        if (chart) {
-          chart.update({ series: [] }, true, true);  // clear all series
-        }
+      if (empty) {
+        if (chart) chart.update({ series: [] }, true, true);  // clear all series
+        customLegendEl.innerHTML = ''; // clear legend too
         return;
       }
-      // <<< END CHANGE
 
       const series = buildSeries(filtered, current.selectedStates);
       const ranges = computeAxisRanges(filtered);
@@ -388,13 +489,24 @@
       try {
         DATA = await loadCSV();
 
-        subjects = Array.from(new Set(DATA.map(r => r.Subject))).sort();
+        // Subjects in desired order: Reading, Mathematics
+        subjects = Array.from(new Set(DATA.map(r => r.Subject)));
+        const desiredOrder = ["Reading", "Mathematics"];
+        subjects.sort((a, b) => {
+          const ia = desiredOrder.indexOf(a);
+          const ib = desiredOrder.indexOf(b);
+          if (ia === -1 && ib === -1) return a.localeCompare(b);
+          if (ia === -1) return 1;
+          if (ib === -1) return -1;
+          return ia - ib;
+        });
+
         grades = Array.from(new Set(DATA.map(r => Number(r.Grade)))).sort((a,b) => a-b);
         states = Array.from(new Set(DATA.map(r => r.State))).sort();
         colorMap = buildColorMap(states);
 
         // Build controls with persistent handlers
-        buildRadios(subjectGroup, "subject", subjects, current.subject);
+        buildRadios(subjectGroup, "subject", subjects, subjects[0]); // Reading first
         buildRadios(gradeGroup, "grade", grades, current.grade);
         buildRadios(modeGroup, "mode", [ALL_LABEL, SEL_LABEL], current.mode);
         modeGroup.onchange = (e) => {
@@ -407,6 +519,9 @@
 
         buildStateSelect(states, current.selectedStates);
         updateStateSelectDisabled();
+
+        // Initialize current.subject to the first radio if needed
+        current.subject = subjects[0] || current.subject;
 
         render();
       } catch (err) {
