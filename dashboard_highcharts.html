@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>NAEP Score Changes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <meta charset="utf-8" />
+ <title>NAEP Score Changes</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Highcharts + Series Labels + Accessibility -->
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-  <script src="https://code.highcharts.com/modules/series-label.js"></script>
-  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+ <!-- Highcharts + Series Labels + Accessibility -->
+ <script src="https://code.highcharts.com/highcharts.js" defer></script>
+ <script src="https://code.highcharts.com/modules/series-label.js" defer></script>
+ <script src="https://code.highcharts.com/modules/accessibility.js" defer></script>
 
-  <!-- PapaParse for CSV parsing -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+ <!-- PapaParse for CSV parsing -->
+ <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" defer></script>
 
-  <style>
+ <style>
     :root { --page-max: 1400px; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; color: #222; background:#fafafa;}
     header { padding: 24px 16px 8px; border-bottom: 1px solid #eee; background:#fff; }
@@ -32,7 +32,6 @@
     .row { display: flex; gap: 10px; flex-wrap: wrap; }
     .help { background: #f6fbff; border: 1px solid #e8f3ff; color: #0b5cab; }
     .small { font-size: 13px; color: #555; }
-    select[multiple] { width: 100%; min-height: 200px; padding: 6px; border: 1px solid #ddd; border-radius: 8px; background: #fff; font-size: 14px; }
     .radio-group { display: grid; gap: 0px; }
     .radio-group label { font-weight: 400; }
     .warn { padding: 10px; border-radius: 10px; background: #fff8e1; border: 1px solid #ffe199; color: #8a6d1d; margin-bottom: 12px; }
@@ -59,96 +58,107 @@
       flex: 0 0 auto;
     }
     #custom-legend .hidden { opacity: 0.4; text-decoration: line-through; }
-  </style>
+ </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <h1>NAEP Score Changes from 2019 to 2024 at Key Points Along the Achievement Spectrum</h1>
-      <p class="sub">Change-by-Baseline Plot: 2019 NAEP baseline score (x-axis) vs. 2024 minus 2019 change (y-axis), across percentiles (10/25/50/75/90) by state.</p>
-    </div>
-  </header>
+ <header>
+ <div class="wrap">
+ <h1>NAEP Score Changes from 2019 to 2024 at Key Points Along the Achievement Spectrum</h1>
+ <p class="sub">Change-by-Baseline Plot: 2019 NAEP baseline score (x-axis) vs. 2024 minus 2019 change (y-axis), across percentiles (10/25/50/75/90) by state.</p>
+ </div>
+ </header>
 
-  <!-- What this dashboard shows (top) -->
-  <section class="wrap">
-    <div class="layout">
-      <div class="panel" style="grid-column: 1 / -1;">
-        <h3>What This Dashboard Shows</h3>
-        <div class="medium">
-          As featured in the ETS Research Institute Blog [here], this dashboard helps visualize the relationship between pre-COVID NAEP scores (2019) and score changes since the pandemic (2024 scores minus 2019 scores) for states and jurisdictions (e.g., Puerto Rico). Check out the blog for more details. <br><br>
-          For a particular grade-subject combination, each state and jurisdiction has a line that connects the score changes for students at low (10<sup>th</sup> and 25<sup>th</sup> percentiles), moderate (50<sup>th</sup> percentile), and high (75<sup>th</sup> and 90<sup>th</sup> percentiles) points of the student achievement spectrum. These lines illustrate how changes from pre to post pandemic varied across the achievement distribution within each state:
-          <ul>
-            <li>Flatter lines indicate more comparable score changes along the distribution.</li>
-            <li>Upward sloping lines suggest larger drops at the low end of the spectrum or a widening of the achievement disparity between lower- and higher-scoring students from 2019 to 2024.</li>
-            <li>An asterisk (*) next to the state’s name in the legend indicates a significantly (p < 0.05) larger drop at the 10th percentile than the 90th percentile.</li>
-            <li>The horizontal line at zero helps distinguish cases with score increases (above the zero line) from those with score decreases (below the zero line).</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+ <!-- What this dashboard shows (top) -->
+ <section class="wrap">
+ <div class="layout">
+ <div class="panel" style="grid-column: 1 / -1;">
+ <h3>What This Dashboard Shows</h3>
+ <div class="medium">
+          As featured in the <a href="https://www.ets.org/insights-and-perspectives/changeovertime.html">ETS Research Institute Blog</a>, this dashboard helps visualize the relationship between pre-COVID NAEP scores (2019) and score changes since the pandemic (2024 scores minus 2019 scores) for different locales (states, districts, and geographic regions). Check out the blog for more details. <br><br>
+          For a particular grade-subject combination, each locale has a line that connects the score changes for students at low (10<sup>th</sup> and 25<sup>th</sup> percentiles), moderate (50<sup>th</sup> percentile), and high (75<sup>th</sup> and 90<sup>th</sup> percentiles) points of the student achievement spectrum. These lines illustrate how changes from pre to post pandemic varied across the achievement distribution within each state:
+ <ul>
+ <li>Flatter lines indicate more comparable score changes along the distribution.</li>
+ <li>Upward sloping lines suggest larger drops at the low end of the spectrum or a widening of the achievement disparity between lower- and higher-scoring students from 2019 to 2024.</li>
+ <li>An asterisk (*) next to the state’s name in the legend indicates a significantly (p < 0.05) larger drop at the 10th percentile than the 90th percentile.</li>
+ <li>A black border around a plotting symbol indicates a significant change (p < 0.05) in the percentile score from 2019 to 2024.</li>
+ <li>Score changes at percentile points can be influenced by changes in student makeup over time. Check out your state's data in the <a href="https://www.nationsreportcard.gov/ndecore/landing">NAEP Data Explorer</a>.</li>
+ <li>The horizontal line at zero helps distinguish cases with score increases (above the zero line) from those with score decreases (below the zero line).</li>
+ </ul>
+ </div>
+ </div>
+ </div>
+ </section>
 
-  <main class="wrap">
-    <div id="warn" class="warn" style="display:none;"></div>
+ <main class="wrap">
+ <div id="warn" class="warn" style="display:none;"></div>
 
-    <div class="layout">
-      <!-- Controls -->
-      <aside class="panel">
-        <h3>Controls</h3>
+ <div class="layout">
+ <!-- Controls -->
+ <aside class="panel">
+ <h3>Controls</h3>
 
-        <label>Subject</label>
-        <div id="subject-group" class="radio-group"></div>
+ <label>Subject</label>
+ <div id="subject-group" class="radio-group"></div>
 
-        <label>Grade</label>
-        <div id="grade-group" class="radio-group"></div>
+ <label>Grade</label>
+ <div id="grade-group" class="radio-group"></div>
 
-        <label>Display Mode</label>
-        <div id="mode-group" class="radio-group"></div>
+ <label>Display Mode</label>
+ <div id="mode-group" class="radio-group"></div>
 
-        <label for="state-select">Selected States</label>
-        <select id="state-select" multiple></select>
-        <div class="small" style="margin-top:6px;">Tip: Hold <b>Ctrl</b>/<b>Cmd</b> (or Shift) to select multiple.</div>
+ <label>Selected Locales (State, Region, District)</label>
+ <input type="text" id="state-search" placeholder="Search locales…" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:4px;">
+ <div style="display:flex;gap:6px;margin-bottom:4px;">
+   <button id="btn-select-all" style="flex:1;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:6px;background:#f5f5f5;cursor:pointer;">Select All</button>
+   <button id="btn-clear-all" style="flex:1;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:6px;background:#f5f5f5;cursor:pointer;">Clear All</button>
+ </div>
+ <div id="state-select" style="width:100%;min-height:200px;max-height:200px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;background:#fff;box-sizing:border-box;padding:4px;"></div>
 
-        <div class="panel help" style="margin-top:12px;">
-          <strong>How to use</strong>
-          <div class="small">
-            Use the controls above to choose subject and grade. In “Selected States” mode, pick specific states.
-            In the chart, click legend entries to show/hide a state.
-          </div>
-        </div>
-        <br>
-        <img src="data/logo.png" alt="ETS Research Institute logo" width="125" height="75" style="border:1px solid white; margin:2px">
-      </aside>
+ <div class="panel help" style="margin-top:12px;">
+ <strong>How to use</strong>
+ <div class="small">
+            Use the controls above to choose subject and grade. In “Selected Locales” mode, pick specific locales.
+            In the chart, click legend entries to show/hide a locale.
+ </div>
+ </div>
+ <br>
+ <img src="data/logo.png" alt="ETS Research Institute logo" width="125" height="75" style="border:1px solid white; margin:2px">
+ </aside>
 
-      <!-- Chart -->
-      <section>
-        <div id="container" class="panel" style="overflow:hidden;">
-          <div id="chart" style="min-height: 650px; width: 100%;"></div>
-          <div id="custom-legend"></div>
-        </div>
-      </section>
-    </div>
-  </main>
+ <!-- Chart -->
+ <section>
+ <div id="container" class="panel" style="overflow:hidden;">
+ <div id="chart" style="min-height: 650px; width: 100%;"></div>
+ <div id="custom-legend"></div>
+ </div>
+ </section>
+ </div>
+ </main>
 
-  <script>
+ <script>
+  window.addEventListener('DOMContentLoaded', function() {
     // ---------------------------
     // Config
     // ---------------------------
-    const CSV_URL = "https://raw.githubusercontent.com/katcast/DataProject/main/Data_for_App_v2.csv";
+    const CSV_URL = "https://raw.githubusercontent.com/katcast/DataProject/main/Data_for_App.csv";
     const ALL_LABEL = "Show All States";
-    const SEL_LABEL = "Select States from Drop-Down Menu";
+    const REG_LABEL = "Show All Regions";
+    const DIS_LABEL = "Show All Districts";
+    const SEL_LABEL = "Select Locales from Drop-Down Menu";
     const PERCENTILE_MARKERS = {10: "triangle-down", 25: "square", 50: "diamond", 75: "circle", 90: "triangle"};
 
     // Colors
-    function buildColorMap(states) {
-      const base = Highcharts.getOptions().colors;
-      const colors = [];
-      while (colors.length < states.length) colors.push(...base);
-      const map = {};
-      states.forEach((s, i) => map[s] = colors[i]);
-      return map;
-    }
+function buildColorMap(states) {
+  const base = Highcharts.getOptions().colors;
+  const colors = [];
+  while (colors.length < states.length) colors.push(...base);
 
+  const map = {};
+  states.forEach((state, i) => {
+    map[state] = colors[i];
+  });
+  return map;
+}
     // UI elements
     const subjectGroup = document.getElementById("subject-group");
     const gradeGroup = document.getElementById("grade-group");
@@ -168,7 +178,7 @@
     let current = {
       subject: "Reading",
       grade: 4,
-      mode: ALL_LABEL,
+      displayModes: [ALL_LABEL], // Changed from mode: ALL_LABEL
       selectedStates: []
     };
 
@@ -181,6 +191,21 @@
       label.setAttribute("for", id);
       const input = document.createElement("input");
       input.type = "radio";
+      input.name = name;
+      input.id = id;
+      input.value = value;
+      input.checked = checked;
+      label.prepend(input);
+      label.append(" " + value);
+      return label;
+    }
+
+    function checkbox(name, value, checked=false) {
+      const id = name + "-" + String(value).replace(/\s+/g, "-");
+      const label = document.createElement("label");
+      label.setAttribute("for", id);
+      const input = document.createElement("input");
+      input.type = "checkbox";
       input.name = name;
       input.id = id;
       input.value = value;
@@ -203,26 +228,76 @@
       };
     }
 
+    let _allStateOptions = [];
+
     function buildStateSelect(options, selected=[]) {
+      _allStateOptions = options;
       stateSelect.innerHTML = "";
-      options.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s;
-        opt.textContent = s;
-        if (selected.includes(s)) opt.selected = true;
-        stateSelect.appendChild(opt);
-      });
-      stateSelect.onchange = () => {
-        const chosen = Array.from(stateSelect.selectedOptions).map(o => o.value);
-        current.selectedStates = chosen;
+      renderCheckboxList(options, selected);
+
+      // Search box
+      const searchEl = document.getElementById("state-search");
+      searchEl.oninput = () => {
+        const q = searchEl.value.toLowerCase();
+        const filtered = _allStateOptions.filter(s => s.toLowerCase().includes(q));
+        renderCheckboxList(filtered, current.selectedStates);
+      };
+
+      // Select All / Clear All
+      document.getElementById("btn-select-all").onclick = () => {
+        const q = document.getElementById("state-search").value.toLowerCase();
+        const visible = _allStateOptions.filter(s => s.toLowerCase().includes(q));
+        visible.forEach(s => { if (!current.selectedStates.includes(s)) current.selectedStates.push(s); });
+        renderCheckboxList(visible, current.selectedStates);
+        render();
+      };
+      document.getElementById("btn-clear-all").onclick = () => {
+        current.selectedStates = [];
+        const q = document.getElementById("state-search").value.toLowerCase();
+        const visible = _allStateOptions.filter(s => s.toLowerCase().includes(q));
+        renderCheckboxList(visible, current.selectedStates);
         render();
       };
     }
 
+    function renderCheckboxList(options, selected) {
+      stateSelect.innerHTML = "";
+      options.forEach(s => {
+        const label = document.createElement("label");
+        label.style.cssText = "display:flex;align-items:center;gap:6px;padding:0 4px;border-radius:5px;cursor:pointer;font-size:13px;";
+        label.onmouseover = () => label.style.background = "#f0f4ff";
+        label.onmouseout  = () => label.style.background = "";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = s;
+        cb.checked = selected.includes(s);
+        cb.style.cursor = "pointer";
+        cb.onchange = () => {
+          if (cb.checked) {
+            if (!current.selectedStates.includes(s)) current.selectedStates.push(s);
+          } else {
+            current.selectedStates = current.selectedStates.filter(x => x !== s);
+          }
+          render();
+        };
+
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(s));
+        stateSelect.appendChild(label);
+      });
+    }
+
     function updateStateSelectDisabled() {
-      const disabled = current.mode === ALL_LABEL;
-      stateSelect.disabled = disabled;
-      stateSelect.title = disabled ? "Enabled only in 'Selected States' mode" : "";
+      const disabled = !current.displayModes.includes(SEL_LABEL);
+      const searchEl = document.getElementById("state-search");
+      const btnSelectAll = document.getElementById("btn-select-all");
+      const btnClearAll = document.getElementById("btn-clear-all");
+      stateSelect.style.opacity = disabled ? "0.4" : "1";
+      stateSelect.style.pointerEvents = disabled ? "none" : "auto";
+      if (searchEl) { searchEl.disabled = disabled; searchEl.style.opacity = disabled ? "0.4" : "1"; }
+      if (btnSelectAll) { btnSelectAll.disabled = disabled; btnSelectAll.style.opacity = disabled ? "0.4" : "1"; }
+      if (btnClearAll) { btnClearAll.disabled = disabled; btnClearAll.style.opacity = disabled ? "0.4" : "1"; }
     }
 
     // ---------------------------
@@ -233,15 +308,28 @@
       const score2019 = Math.round(Number(row["Score.2019"]));
       const score2024 = Math.round(Number(row["Score.2024"]));
       const change = Math.round(Number(row["Score.Change"]));
-      const sigStr = String(row["significant"]).toLowerCase();
-      const significant = (sigStr === "true" || sigStr === "1");
+      const sigStr = String(row["gapsignificant"]).toLowerCase();
+      const gapsignificant = (sigStr === "true" || sigStr === "1");
+      const sigStr2 = String(row["percentilesignificant"]).toLowerCase();
+      const isPercentileSignificant = (sigStr2 === "true" || sigStr2 === "1");
 
       return {
         x: score2019,
         y: change,
-        marker: { symbol: PERCENTILE_MARKERS[p] || "circle", radius: isSelected ? 7 : 5, lineColor: "black", lineWidth: 1, fillColor: color },
+   //     marker: { symbol: PERCENTILE_MARKERS[p] || "circle", radius: isSelected ? 7 : 5, lineColor: "black", lineWidth: 1, fillColor: color },
+    marker: {
+      symbol: PERCENTILE_MARKERS[p] || "circle",
+      radius: isSelected ? 7 : 5,
+  //    lineColor: isPercentileSignificant ? "black" : color,
+      lineColor: isPercentileSignificant ? "black" : "#00000033",
+  //   lineWidth: isPercentileSignificant ? 2 : 1,
+     lineWidth: 1,
+      fillColor: color,
+  //    fillColor: isPercentileSignificant ? color : "white",
+    },
         color,
-        custom: { state: `${row["State"]}${significant ? "*" : ""}`, percentile: p, score2019, score2024, change },
+       isPercentileSignificant,
+        custom: { state: `${row["State"]}${gapsignificant ? "*" : ""}`, percentile: p, score2019, score2024, change },
         name: `${row["State"]} • P${p}`,
         accessibility: { description: `${row["State"]} percentile ${p}, baseline ${score2019}, 2024 score ${score2024}, change ${change}.` }
       };
@@ -249,14 +337,27 @@
 
     function buildSeries(filtered, selectedList) {
       const series = [];
-      const statesToInclude = (current.mode === SEL_LABEL && selectedList.length)
-        ? selectedList
-        : Array.from(new Set(filtered.map(r => r.State)));
+      let statesToInclude = [];
+
+      if (current.displayModes.includes(SEL_LABEL)) {
+        if (selectedList.length > 0) {
+          statesToInclude = selectedList;
+        }
+      } else {
+        const typesToShow = [];
+        if (current.displayModes.includes(ALL_LABEL)) typesToShow.push('State');
+        if (current.displayModes.includes(REG_LABEL)) typesToShow.push('Region');
+        if (current.displayModes.includes(DIS_LABEL)) typesToShow.push('District');
+
+        if (typesToShow.length > 0) {
+          statesToInclude = Array.from(new Set(filtered.filter(r => typesToShow.includes(r.Type)).map(r => r.State)));
+        }
+      }
 
       statesToInclude.forEach(state => {
         const rows = filtered.filter(r => r.State === state).sort((a,b) => a.Percentile - b.Percentile);
         const significantAny = rows.some(r => {
-          const s = String(r.significant).toLowerCase();
+          const s = String(r.gapsignificant).toLowerCase();
           return (s === "true" || s === "1");
         });
         const color = colorMap[state];
@@ -287,7 +388,7 @@
       const xMin = Math.floor(Math.min(...xs) - 2);
       const xMax = Math.ceil(Math.max(...xs) + 2);
       const yMin = -20;
-      const yMax = 10;
+      const yMax = 10.5;
       return { xMin, xMax, yMin, yMax };
     }
 
@@ -310,20 +411,42 @@
         yAxis: {
           title: { text: 'Change (2024 Score Minus 2019 Score)' },
           min: ranges.yMin, max: ranges.yMax,
+          endOnTick: false,
           gridLineWidth: 1,
           plotLines: [{ value: 0, width: 2, color: 'black', zIndex: 5 }]
         },
-        tooltip: {
-          useHTML: true,
-          pointFormat:
-            "<b>{point.custom.state}</b><br/>" +
-            "Percentile: {point.custom.percentile}th<br/>" +
-            "2019 Score: {point.custom.score2019}<br/>" +
-            "2024 Score: {point.custom.score2024}<br/>" +
-            "Change: {point.custom.change} points",
-          shared: false,
-          headerFormat: "",
-        },
+//        tooltip: {
+//          useHTML: true,
+//          pointFormat:
+//            "<b>{point.custom.state}</b><br/>" +
+//            "Percentile: {point.custom.percentile}th<br/>" +
+//            "2019 Score: {point.custom.score2019}<br/>" +
+//            "2024 Score: {point.custom.score2024}<br/>" +
+//            "Change: {point.custom.change} points",
+//          shared: false,
+//          headerFormat: "",
+//        },
+tooltip: {
+  useHTML: true,
+  shared: false,
+  headerFormat: "",
+  formatter: function () {
+    // Access your custom property
+    const sig = this.point.isPercentileSignificant;
+   //     const sig = rows.some(r => {
+   //       const s = String(r.isPercentileSignificant).toLowerCase();
+   //       return (s === "true" || s === "1");
+   //     });
+    return (
+      `<b>${this.point.custom.state}</b><br/>` +
+      `Percentile: ${this.point.custom.percentile}th<br/>` +
+      `2019 Score: ${this.point.custom.score2019}<br/>` +
+      `2024 Score: ${this.point.custom.score2024}<br/>` +
+      `Change: ${this.point.custom.change} points<br/>` +
+      `${sig ? "Significant Change" : ""}`
+    );
+  }
+},
         plotOptions: {
           series: {
             animation: true,
@@ -339,11 +462,12 @@
         accessibility: {
           enabled: true,
           keyboardNavigation: { enabled: true },
-          screenReaderSection: {
-            beforeChartFormat:
-              "<h1>{chartTitle}</h1><p>This chart shows NAEP 2019 baseline scores on the x-axis and 2024 minus 2019 change on the y-axis. " +
-              "Each series represents a state across five percentiles.</p>"
-          }
+          screenReaderSection:
+            {
+              beforeChartFormat:
+                "<h1>{chartTitle}</h1><p>This chart shows NAEP 2019 baseline scores on the x-axis and 2024 minus 2019 change on the y-axis. " +
+                "Each series represents a state across five percentiles.</p>"
+            }
         },
         credits: { enabled: false },
         exporting: { enabled: true },
@@ -352,7 +476,6 @@
 
       // Ensure Highcharts knows its size inside CSS grid
       chart.reflow();
-      window.addEventListener('resize', () => chart && chart.reflow());
 
       // (Re)build custom legend after chart renders
       renderCustomLegend(chart, 6); // desired number of columns
@@ -428,11 +551,11 @@
     // ---------------------------
     function render() {
       const filtered = DATA.filter(r => r.Subject === current.subject && Number(r.Grade) === Number(current.grade));
-      const empty = (current.mode === SEL_LABEL && current.selectedStates.length === 0);
+      const empty = (current.displayModes.includes(SEL_LABEL) && current.selectedStates.length === 0);
 
       // Show/hide the warning text
-      // warnBox.style.display = warn ? "block" : "none";
-      // warnBox.innerText = warn ? "Select one or more states to view data." : "";
+      warnBox.style.display = empty ? "block" : "none";
+      warnBox.innerText = empty ? "Select one or more states to view data." : "";
 
       if (empty) {
         if (chart) chart.update({ series: [] }, true, true);  // clear all series
@@ -465,16 +588,20 @@
           Subject: r.Subject ?? r.subject ?? "",
           Grade: Number(r.Grade ?? r.grade),
           State: r.State ?? r.state ?? "",
+          Type: r.Type ?? r.type ?? "",
           Percentile: Number(r.Percentile ?? r.percentile),
           "Score.2019": Number(r["Score.2019"] ?? r.Score2019 ?? r.score2019),
           "Score.2024": Number(r["Score.2024"] ?? r.Score2024 ?? r.score2024),
           "Score.Change": Number(r["Score.Change"] ?? r.ScoreChange ?? r.scoreChange),
-          significant: r.significant ?? r.Significant ?? r.SIGNIFICANT ?? false
+  //        significant: r.significant ?? r.Significant ?? r.SIGNIFICANT ?? false
+          gapsignificant: r.gapsignificant ?? r.gapSignificant ?? r.gapSIGNIFICANT ?? false,
+          percentilesignificant: r.percentilesignificant ?? r.percentilesSignificant ?? r.percentilesSIGNIFICANT ?? false
         }))
         .filter(r =>
           r.Subject &&
           Number.isFinite(r.Grade) &&
           r.State &&
+          r.Type &&
           Number.isFinite(r.Percentile) &&
           Number.isFinite(r["Score.2019"]) &&
           Number.isFinite(r["Score.2024"]) &&
@@ -495,7 +622,7 @@
         subjects.sort((a, b) => {
           const ia = desiredOrder.indexOf(a);
           const ib = desiredOrder.indexOf(b);
-          if (ia === -1 && ib === -1) return a.localeCompare(b);
+          if (ia === ib) return 0;
           if (ia === -1) return 1;
           if (ib === -1) return -1;
           return ia - ib;
@@ -508,28 +635,49 @@
         // Build controls with persistent handlers
         buildRadios(subjectGroup, "subject", subjects, subjects[0]); // Reading first
         buildRadios(gradeGroup, "grade", grades, current.grade);
-        buildRadios(modeGroup, "mode", [ALL_LABEL, SEL_LABEL], current.mode);
+
+        // Custom build for modeGroup (checkboxes + radio)
+        const modes = [ALL_LABEL, REG_LABEL, DIS_LABEL];
+        const checkboxes = modes.map(m => checkbox("mode", m, current.displayModes.includes(m)));
+        const radioSel = radio("mode-radio", SEL_LABEL, current.displayModes.includes(SEL_LABEL));
+
+        modeGroup.innerHTML = "";
+        checkboxes.forEach(c => modeGroup.appendChild(c));
+        modeGroup.appendChild(radioSel);
+
         modeGroup.onchange = (e) => {
-          if (e.target && e.target.name === "mode") {
-            current.mode = e.target.value;
-            updateStateSelectDisabled();
-            render();
+          if (!e.target) return;
+
+          if (e.target.type === 'radio' && e.target.checked) {
+            current.displayModes = [SEL_LABEL];
+            checkboxes.forEach(c => c.querySelector('input').checked = false);
+          } else if (e.target.type === 'checkbox') {
+            // Uncheck radio if a checkbox is checked
+            radioSel.querySelector('input').checked = false;
+            current.displayModes = checkboxes
+              .filter(c => c.querySelector('input').checked)
+              .map(c => c.querySelector('input').value);
+
+            // If no checkboxes are selected, default to ALL_LABEL
+            if (current.displayModes.length === 0) {
+              current.displayModes = [ALL_LABEL];
+              checkboxes[0].querySelector('input').checked = true;
+            }
           }
+
+          updateStateSelectDisabled();
+          render();
         };
 
-        buildStateSelect(states, current.selectedStates);
         updateStateSelectDisabled();
-
-        // Initialize current.subject to the first radio if needed
-        current.subject = subjects[0] || current.subject;
-
+        buildStateSelect(states);
         render();
-      } catch (err) {
-        warnBox.style.display = "block";
-        warnBox.innerText = "Error loading data: " + (err && err.message ? err.message : String(err));
-        console.error(err);
+        window.addEventListener('resize', () => chart && chart.reflow());
+      } catch (e) {
+        document.body.innerHTML = "<pre>" + e.message + "</pre>";
       }
     })();
-  </script>
+  }); // end DOMContentLoaded
+ </script>
 </body>
 </html>
