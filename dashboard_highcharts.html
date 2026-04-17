@@ -152,11 +152,8 @@ function buildColorMap(states) {
   const base = Highcharts.getOptions().colors;
   const colors = [];
   while (colors.length < states.length) colors.push(...base);
-
   const map = {};
-  states.forEach((state, i) => {
-    map[state] = colors[i];
-  });
+  states.forEach((state, i) => { map[state] = colors[i]; });
   return map;
 }
     // UI elements
@@ -354,13 +351,14 @@ function buildColorMap(states) {
         }
       }
 
-      statesToInclude.forEach(state => {
+      const base = Highcharts.getOptions().colors;
+      statesToInclude.forEach((state, idx) => {
         const rows = filtered.filter(r => r.State === state).sort((a,b) => a.Percentile - b.Percentile);
         const significantAny = rows.some(r => {
           const s = String(r.gapsignificant).toLowerCase();
           return (s === "true" || s === "1");
         });
-        const color = colorMap[state];
+        const color = base[idx % base.length];
         const isSel = selectedList.includes(state);
         const data = rows.map(r => makePoint(r, color, isSel));
 
